@@ -1,0 +1,11 @@
+services:
+  ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dealit-ai
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
