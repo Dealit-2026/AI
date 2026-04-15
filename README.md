@@ -1,35 +1,38 @@
 # Dealit AI Server
 
-중고 경매 서비스용 AI 서버 초기 세팅입니다. 현재 구조는 아키텍처 이미지에 맞춰 `FastAPI` 기반 독립 서버로 구성되어 있으며, 백엔드(Spring)에서 HTTP로 호출하는 형태를 전제로 합니다.
+FastAPI-based AI service for item recommendation experiments. The current implementation exposes a small HTTP API and separates transport, use-case orchestration, business rules, and runtime concerns.
 
-## 현재 포함된 기능
+## Endpoints
 
 - `GET /api/v1/health`
 - `POST /api/v1/recommendations/items`
-- 환경변수 설정 분리
-- Docker 빌드 설정
-- 카테고리/가격 추천용 서비스 레이어 분리
 
-## 프로젝트 구조
+## Project Structure
 
 ```text
 app/
-  core/
-    config.py
-  routers/
-    health.py
-    recommendation.py
-  schemas/
-    recommendation.py
-  services/
-    recommendation_service.py
+  application/
+    use_cases/
+  domain/
+    recommendation/
+  infrastructure/
+    config/
+  presentation/
+    http/
+      routers/
+      schemas/
   main.py
+docs/
+  architecture.md
 Dockerfile
 requirements.txt
 .env.example
 ```
 
-## 실행 방법
+Detailed architecture notes live in [docs/architecture.md](docs/architecture.md).
+Korean translation: [docs/architecture.ko.md](docs/architecture.ko.md).
+
+## Run
 
 ```bash
 python -m venv .venv
@@ -44,19 +47,19 @@ Swagger UI:
 http://localhost:8000/docs
 ```
 
-## API 예시
+## API Example
 
-### 요청
+Request:
 
 ```json
 {
   "image_url": "https://example.com/item.jpg",
-  "title": "아이폰 15 프로 256GB 판매",
-  "description": "생활기스 조금 있고 정상 작동합니다."
+  "title": "iPhone 15 Pro 256GB",
+  "description": "Used item in good condition and fully functional."
 }
 ```
 
-### 응답
+Response:
 
 ```json
 {
@@ -65,15 +68,13 @@ http://localhost:8000/docs
   "suggested_price_min": 300000,
   "suggested_price_max": 900000,
   "price_confidence": 0.62,
-  "reasoning": "텍스트 기반 휴대폰 관련 키워드를 감지했습니다.",
+  "reasoning": "제목과 설명에서 스마트폰 관련 키워드를 감지했습니다.",
   "model_version": "rule-based-mvp-v1"
 }
 ```
 
-## 다음 단계
+## Next Steps
 
-1. 이미지 임베딩 또는 멀티모달 모델 연동
-2. 과거 거래 데이터 기반 가격 추정 로직 추가
-3. OpenAI 또는 Gemini 연동
-4. S3 이미지 접근 및 전처리 추가
-5. Docker Compose 또는 ECS 배포 설정 추가
+1. Replace the rule-based recommender with an LLM or multimodal inference path.
+2. Add pricing logic backed by transaction history or marketplace data.
+3. Add infrastructure adapters for storage, cache, and model providers.
