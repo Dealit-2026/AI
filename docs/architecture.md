@@ -79,6 +79,7 @@ Owns bootstrap only.
 
 - Creates the FastAPI app
 - loads settings
+- wires application use cases with their concrete implementations
 - registers the API router
 
 Business decisions should not accumulate here.
@@ -89,6 +90,8 @@ The intended dependency flow is:
 
 ```text
 presentation -> application -> domain
+main -> application
+main -> domain
 main -> infrastructure
 main -> presentation
 application -> domain
@@ -123,4 +126,3 @@ If the project later calls an external model:
 - the domain should continue to define business-level inputs, outputs, and policies around the result
 
 This keeps the repo understandable for later AI sessions and for humans working in the same codebase.
-

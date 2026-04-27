@@ -80,6 +80,7 @@ HTTP 진입점과 페이로드 형식을 담당합니다.
 
 - FastAPI 앱 생성
 - 설정 로딩
+- application use case와 구체 구현체 조립
 - API 라우터 등록
 
 비즈니스 의사결정 로직이 여기에 쌓이면 안 됩니다.
@@ -90,6 +91,8 @@ HTTP 진입점과 페이로드 형식을 담당합니다.
 
 ```text
 presentation -> application -> domain
+main -> application
+main -> domain
 main -> infrastructure
 main -> presentation
 application -> domain
@@ -124,4 +127,3 @@ infrastructure -> external systems
 - 비즈니스 수준의 입력, 출력, 후처리 정책은 계속 `domain`
 
 이렇게 나누면 이후의 AI 세션이나 다른 개발자도 구조를 빠르게 이해하고 안전하게 확장할 수 있습니다.
-
