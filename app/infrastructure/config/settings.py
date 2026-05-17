@@ -9,8 +9,13 @@ class Settings(BaseSettings):
     app_host: str = "0.0.0.0"
     app_port: int = 8000
     api_prefix: str = "/api/v1"
+    ai_provider: str = "gemini"
     openai_api_key: str = ""
+    openai_model: str = "gpt-5-mini"
     gemini_api_key: str = ""
+    gemini_model: str = "gemini-2.0-flash"
+    gemini_timeout_seconds: float = 15.0
+    gemini_max_image_bytes: int = 6_000_000
     aws_region: str = "ap-northeast-2"
     s3_bucket: str = ""
 
