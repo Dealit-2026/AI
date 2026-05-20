@@ -9,9 +9,6 @@ class Settings(BaseSettings):
     app_host: str = "0.0.0.0"
     app_port: int = 8000
     api_prefix: str = "/api/v1"
-    ai_provider: str = "gemini"
-    openai_api_key: str = ""
-    openai_model: str = "gpt-5-mini"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
     gemini_timeout_seconds: float = 15.0
@@ -23,6 +20,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",
     )
 
 

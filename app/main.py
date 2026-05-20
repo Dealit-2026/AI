@@ -13,7 +13,6 @@ from app.infrastructure.gemini.category_recommender import (
     FallbackCategoryRecommender,
     GeminiCategoryRecommender,
 )
-from app.infrastructure.openai.category_recommender import OpenAICategoryRecommender
 from app.presentation.http.api import api_router
 
 settings = get_settings()
@@ -33,20 +32,12 @@ app.state.recommend_item_use_case = RecommendItemUseCase(
     recommender=RuleBasedItemRecommender()
 )
 
-if settings.ai_provider.lower() == "openai":
-    category_recommender = OpenAICategoryRecommender(
-        api_key=settings.openai_api_key,
-        model=settings.openai_model,
-        timeout_seconds=settings.gemini_timeout_seconds,
-        max_image_bytes=settings.gemini_max_image_bytes,
-    )
-else:
-    category_recommender = GeminiCategoryRecommender(
-        api_key=settings.gemini_api_key,
-        model=settings.gemini_model,
-        timeout_seconds=settings.gemini_timeout_seconds,
-        max_image_bytes=settings.gemini_max_image_bytes,
-    )
+category_recommender = GeminiCategoryRecommender(
+    api_key=settings.gemini_api_key,
+    model=settings.gemini_model,
+    timeout_seconds=settings.gemini_timeout_seconds,
+    max_image_bytes=settings.gemini_max_image_bytes,
+)
 
 app.state.recommend_category_use_case = RecommendCategoryUseCase(
     recommender=FallbackCategoryRecommender(

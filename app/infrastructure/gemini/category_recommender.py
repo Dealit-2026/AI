@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import json
 import logging
@@ -45,7 +46,7 @@ class GeminiCategoryRecommender:
             raise ValueError("category candidates are required")
 
         parts = [{"text": self._build_prompt(query)}]
-        parts.extend(self._build_image_parts(query.image_urls))
+        parts.extend(asyncio.run(self._build_image_parts(query.image_urls)))
 
         endpoint = (
             "https://generativelanguage.googleapis.com/v1beta/"
@@ -93,16 +94,22 @@ class GeminiCategoryRecommender:
             f"Candidates: {json.dumps(candidates, ensure_ascii=False)}"
         )
 
-    def _build_image_parts(self, image_urls: tuple[str, ...]) -> list[dict]:
-        image_parts = []
-        for image_url in image_urls[:3]:
-            image_parts.append(self._download_image_part(image_url))
-        return image_parts
+    async def _build_image_parts(self, image_urls: tuple[str, ...]) -> list[dict]:
+        urls = image_urls[:3]
+        if not urls:
+            return []
 
-    def _download_image_part(self, image_url: str) -> dict:
-        with httpx.Client(timeout=self._timeout_seconds, follow_redirects=True) as client:
-            response = client.get(image_url)
-            response.raise_for_status()
+        async with httpx.AsyncClient(
+            timeout=self._timeout_seconds,
+            follow_redirects=True,
+        ) as client:
+            return await asyncio.gather(
+                *(self._download_image_part(client, image_url) for image_url in urls)
+            )
+
+    async def _download_image_part(self, client: httpx.AsyncClient, image_url: str) -> dict:
+        response = await client.get(image_url)
+        response.raise_for_status()
 
         content = response.content
         if len(content) > self._max_image_bytes:
