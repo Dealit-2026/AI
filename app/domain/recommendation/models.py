@@ -18,3 +18,33 @@ class RecommendationResult:
     reasoning: str
     model_version: str
 
+
+@dataclass(frozen=True)
+class CategoryCandidate:
+    id: int
+    name_ko: str
+    name_en: str
+
+
+@dataclass(frozen=True)
+class CategoryRecommendationQuery:
+    title: str | None
+    description: str | None
+    image_urls: tuple[str, ...]
+    candidates: tuple[CategoryCandidate, ...]
+
+
+@dataclass(frozen=True)
+class CategoryRecommendationAlternative:
+    category_id: int
+    confidence: float
+
+
+@dataclass(frozen=True)
+class CategoryRecommendationResult:
+    recommended_category_id: int
+    confidence: float
+    reason: str
+    alternatives: tuple[CategoryRecommendationAlternative, ...]
+    model_version: str
+
