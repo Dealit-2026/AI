@@ -55,7 +55,7 @@ class GeminiCategoryRecommender:
         payload = {
             "contents": [{"role": "user", "parts": parts}],
             "generationConfig": {
-                "temperature": 0.1,
+                "temperature": 0,
                 "response_mime_type": "application/json",
             },
         }
