@@ -2,15 +2,20 @@ from fastapi import APIRouter, Depends, Request
 
 from app.application.use_cases.recommend_category import RecommendCategoryUseCase
 from app.application.use_cases.recommend_item import RecommendItemUseCase
+from app.application.use_cases.recommend_price import RecommendPriceUseCase
 from app.domain.recommendation.models import (
     CategoryCandidate,
     CategoryRecommendationQuery,
+    PriceRecommendationQuery,
+    RecentPrice,
     RecommendationQuery,
 )
 from app.presentation.http.schemas.recommendation import (
     CategoryRecommendationAlternativeResponse,
     CategoryRecommendationRequest,
     CategoryRecommendationResponse,
+    PriceRecommendationRequest,
+    PriceRecommendationResponse,
     RecommendationRequest,
     RecommendationResponse,
 )
@@ -24,6 +29,10 @@ def get_recommend_item_use_case(request: Request) -> RecommendItemUseCase:
 
 def get_recommend_category_use_case(request: Request) -> RecommendCategoryUseCase:
     return request.app.state.recommend_category_use_case
+
+
+def get_recommend_price_use_case(request: Request) -> RecommendPriceUseCase:
+    return request.app.state.recommend_price_use_case
 
 
 @router.post("/items", response_model=RecommendationResponse)
@@ -80,5 +89,39 @@ def recommend_category(
             )
             for alternative in result.alternatives
         ],
+        modelVersion=result.model_version,
+    )
+
+
+@router.post("/prices", response_model=PriceRecommendationResponse)
+def recommend_price(
+    request: PriceRecommendationRequest,
+    use_case: RecommendPriceUseCase = Depends(get_recommend_price_use_case),
+) -> PriceRecommendationResponse:
+    result = use_case.execute(
+        PriceRecommendationQuery(
+            title=request.title,
+            description=request.description,
+            category_id=request.categoryId,
+            category_name=request.categoryName,
+            sale_type=request.saleType,
+            image_urls=tuple(request.imageUrls),
+            recent_prices=tuple(
+                RecentPrice(
+                    price=recent_price.price,
+                    title=recent_price.title,
+                    sold_at=recent_price.soldAt,
+                )
+                for recent_price in request.recentPrices
+            ),
+        )
+    )
+    return PriceRecommendationResponse(
+        suggestedPriceMin=result.suggested_price_min,
+        suggestedPrice=result.suggested_price,
+        suggestedPriceMax=result.suggested_price_max,
+        confidence=result.confidence,
+        reason=result.reason,
+        factors=list(result.factors),
         modelVersion=result.model_version,
     )

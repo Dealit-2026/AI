@@ -45,3 +45,28 @@ class CategoryRecommendationResponse(BaseModel):
     alternatives: list[CategoryRecommendationAlternativeResponse]
     modelVersion: str
 
+
+class RecentPriceRequest(BaseModel):
+    price: int = Field(gt=0)
+    title: str | None = Field(default=None, max_length=200)
+    soldAt: str | None = Field(default=None, max_length=80)
+
+
+class PriceRecommendationRequest(BaseModel):
+    title: str | None = Field(default=None, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+    categoryId: int | None = Field(default=None, gt=0)
+    categoryName: str | None = Field(default=None, max_length=100)
+    saleType: str | None = Field(default=None, max_length=40)
+    imageUrls: list[str] = Field(default_factory=list, max_length=5)
+    recentPrices: list[RecentPriceRequest] = Field(default_factory=list, max_length=50)
+
+
+class PriceRecommendationResponse(BaseModel):
+    suggestedPriceMin: int = Field(ge=0)
+    suggestedPrice: int = Field(ge=0)
+    suggestedPriceMax: int = Field(ge=0)
+    confidence: float = Field(ge=0.0, le=1.0)
+    reason: str
+    factors: list[str]
+    modelVersion: str

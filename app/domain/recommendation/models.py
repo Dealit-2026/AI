@@ -48,3 +48,31 @@ class CategoryRecommendationResult:
     alternatives: tuple[CategoryRecommendationAlternative, ...]
     model_version: str
 
+
+@dataclass(frozen=True)
+class RecentPrice:
+    price: int
+    title: str | None = None
+    sold_at: str | None = None
+
+
+@dataclass(frozen=True)
+class PriceRecommendationQuery:
+    title: str | None
+    description: str | None
+    category_id: int | None
+    category_name: str | None
+    sale_type: str | None
+    image_urls: tuple[str, ...]
+    recent_prices: tuple[RecentPrice, ...]
+
+
+@dataclass(frozen=True)
+class PriceRecommendationResult:
+    suggested_price_min: int
+    suggested_price: int
+    suggested_price_max: int
+    confidence: float
+    reason: str
+    factors: tuple[str, ...]
+    model_version: str
