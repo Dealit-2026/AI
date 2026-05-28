@@ -6,6 +6,8 @@ FastAPI-based AI service for item recommendation experiments. The current implem
 
 - `GET /api/v1/health`
 - `POST /api/v1/recommendations/items`
+- `POST /api/v1/recommendations/categories`
+- `POST /api/v1/recommendations/prices`
 
 ## Project Structure
 
@@ -49,7 +51,7 @@ http://localhost:8000/docs
 
 ## API Example
 
-Request:
+Item recommendation request:
 
 ```json
 {
@@ -59,7 +61,7 @@ Request:
 }
 ```
 
-Response:
+Item recommendation response:
 
 ```json
 {
@@ -72,6 +74,68 @@ Response:
   "model_version": "rule-based-mvp-v1"
 }
 ```
+
+Category recommendation request:
+
+```json
+{
+  "title": "아이폰 15 프로",
+  "description": "배터리 성능 90%이고 상태 좋습니다.",
+  "imageUrls": ["https://example.com/item.jpg"],
+  "candidates": [
+    {"id": 200, "nameKo": "디지털/전자기기", "nameEn": "Digital/Electronics"},
+    {"id": 300, "nameKo": "가구/인테리어", "nameEn": "Furniture/Interior"},
+    {"id": 999, "nameKo": "기타", "nameEn": "Others"}
+  ]
+}
+```
+
+Category recommendation response:
+
+```json
+{
+  "recommendedCategoryId": 200,
+  "confidence": 0.91,
+  "reason": "상품명과 이미지가 스마트폰으로 판단됩니다.",
+  "alternatives": [
+    {"categoryId": 999, "confidence": 0.12}
+  ],
+  "modelVersion": "gemini-2.0-flash"
+}
+```
+
+Price recommendation request:
+
+```json
+{
+  "title": "아이폰 15 프로 256GB",
+  "description": "상태 좋은 중고폰입니다. 배터리 성능 90%입니다.",
+  "categoryId": 200,
+  "categoryName": "디지털/전자기기",
+  "saleType": "REGULAR",
+  "imageUrls": ["https://example.com/item.jpg"],
+  "recentPrices": [
+    {"price": 580000, "title": "아이폰 15 프로 256GB", "soldAt": "2026-05-01"}
+  ]
+}
+```
+
+Price recommendation response:
+
+```json
+{
+  "suggestedPriceMin": 520000,
+  "suggestedPrice": 610000,
+  "suggestedPriceMax": 700000,
+  "confidence": 0.78,
+  "reason": "상품명, 설명, 이미지와 최근 거래가를 기준으로 중고 시세 범위를 산정했습니다.",
+  "factors": ["모델명", "저장용량", "상품상태", "최근거래가"],
+  "modelVersion": "gemini-2.0-flash"
+}
+```
+
+Gemini-backed category and price recommendation falls back to rule-based logic
+when `GEMINI_API_KEY` is missing or the upstream request fails.
 
 ## Next Steps
 
